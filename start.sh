@@ -1,0 +1,1 @@
+nohup streamlit ./app.py > ~/talk-to-books.log 2>&1 &
