@@ -23,24 +23,31 @@ def main():
 
     if uploaded_pics is not None and len(uploaded_pics) > 0:
 
+        ITEM_PER_ROW = 3
+        # convert uploaded_pics into a two dimensional list, each row contains ITEM_PER_ROW items
+        uploaded_pics = [uploaded_pics[i:i + ITEM_PER_ROW] for i in range(0, len(uploaded_pics), ITEM_PER_ROW)]
+
         prompt = st.text_area("Prompt", value="These are pictures of a book. Create a script to be used as English learning material, so that child can learn English by reading the script. Use your imagination to cover as many elements in the picutres as possible, trying to create a complete story to chain all pictures together. No extra text is needed in your response, just the script itself.")
 
-        for pic in uploaded_pics:
-            if pic.type == 'image/heic':
-                pic = convert_heic_to_jpg(pic.read())
-                pic_bytes = get_image_bytes(pic)
-            else:
-                pic_bytes = pic.read()
-            pic_bytes_list.append(pic_bytes)
-            file_bytes = np.asarray(bytearray(pic_bytes), dtype=np.uint8)
-            opencv_image = cv2.imdecode(file_bytes, 1)
+        for pics_per_row in uploaded_pics:
+            row = st.columns(len(pics_per_row), gap="large", vertical_alignment="bottom")
+            for idx, pic in enumerate(pics_per_row):
+                if pic.type == 'image/heic':
+                    pic = convert_heic_to_jpg(pic.read())
+                    pic_bytes = get_image_bytes(pic)
+                else:
+                    pic_bytes = pic.read()
+                pic_bytes_list.append(pic_bytes)
+                file_bytes = np.asarray(bytearray(pic_bytes), dtype=np.uint8)
+                opencv_image = cv2.imdecode(file_bytes, 1)
 
-            st.image(opencv_image, channels="BGR")
+                row[idx].image(opencv_image, channels="BGR")
 
     if st.button("Generate story") and uploaded_pics is not None and len(uploaded_pics) > 0:
         with st.spinner("Generating story..."):
             story = pictures_to_story(pic_bytes_list, prompt)
-            st.write(story)
+            container = st.container(height=200)
+            container.write(story)
 
             audio_filename, audio_bytes_io = text_to_audio(story)
             st.audio(audio_bytes_io, format='audio/wav')
