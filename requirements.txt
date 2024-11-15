@@ -3,3 +3,4 @@ python-dotenv==1.0.0
 openai==1.42.0
 numpy==1.26.3
 opencv-python==4.10.0.84
+pillow_heif==0.20.0
