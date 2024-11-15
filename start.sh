@@ -1,1 +1,1 @@
-nohup streamlit ./app.py > ~/talk-to-books.log 2>&1 &
+nohup streamlit run ./app.py > ~/talk-to-books.log 2>&1 &
